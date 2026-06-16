@@ -1,11 +1,42 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { SiteLayout, PageHero } from "@/components/site/Layout";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 import { usePageMeta } from "@/lib/use-page-meta";
 function Page() {
   usePageMeta("Contact Us — Bright Vision Law College", "Reach BVC at Samjhana Chowk, Biratnagar-06, Morang, Koshi, Nepal.");
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const form = e.currentTarget;
+    const data = {
+      full_name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
+      selected_program: (form.elements.namedItem("programme") as HTMLInputElement).value,
+      message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
+    };
+
+    const { error: sbError } = await supabase.from("contact_submissions").insert([data]);
+
+    if (sbError) {
+      setError("Failed to send message. Please try again.");
+      console.error(sbError);
+    } else {
+      setSent(true);
+      formRef.current?.reset();
+    }
+    setLoading(false);
+  }
+
   return (
     <SiteLayout>
       <PageHero eyebrow="Get in Touch" title="Contact Us" subtitle="Admissions enquiries, partnerships, and general correspondence." />
@@ -35,7 +66,8 @@ function Page() {
           </div>
 
           <form
-            onSubmit={(e) => { e.preventDefault(); setSent(true); }}
+            ref={formRef}
+            onSubmit={handleSubmit}
             className="rounded-md border border-border bg-card p-8 shadow-sm"
           >
             <h3 className="font-serif text-2xl font-bold text-navy">Send a Message</h3>
@@ -50,16 +82,21 @@ function Page() {
               <label htmlFor="message" className="block text-xs font-bold tracking-widest text-muted-foreground uppercase">Message</label>
               <textarea
                 id="message"
+                name="message"
                 required
                 rows={5}
                 className="mt-1.5 w-full rounded-sm border border-input bg-background px-3.5 py-2.5 text-sm transition focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
               />
             </div>
+            {error && (
+              <p className="mt-3 text-sm text-red-500">{error}</p>
+            )}
             <button
               type="submit"
-              className="mt-6 inline-flex w-full items-center justify-center rounded-sm bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-navy"
+              disabled={loading || sent}
+              className="mt-6 inline-flex w-full items-center justify-center rounded-sm bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-navy disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {sent ? "Message Received — Thank You" : "Submit Enquiry"}
+              {sent ? "Message Received — Thank You" : loading ? "Sending…" : "Submit Enquiry"}
             </button>
           </form>
         </div>

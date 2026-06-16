@@ -39,11 +39,14 @@ const STATS = [
   { value: "NBC", label: "Nepal Bar Council Recognized", Icon: Users },
 ];
 
+const STORAGE = "https://hiejrdhxzwrmnalhbegt.supabase.co/storage/v1/object/public/college_assets";
+
 const NOTICES = [
-  { date: "Aug 15, 2026", tag: "Admission", title: "B.A.LL.B Integrated — Entrance Exam Registration Closing", file: "ballb-2026.pdf" },
-  { date: "Sep 02, 2026", tag: "Exam", title: "LL.M Entrance Examination — Hall Ticket Available", file: "llm-hall-ticket.pdf" },
-  { date: "Sep 18, 2026", tag: "Calendar", title: "Academic Calendar 2026-27 Released", file: "academic-calendar.pdf" },
-  { date: "Oct 12, 2026", tag: "Event", title: "12th National Inter-College Moot Court Competition", file: "moot-2026.pdf" },
+  { date: "Aug 15, 2026", tag: "Admission", title: "B.A.LL.B Integrated — Entrance Exam Registration Closing", url: `${STORAGE}/admission-ballb.pdf` },
+  { date: "Sep 02, 2026", tag: "Exam", title: "LL.M Entrance Examination — Hall Ticket Available", url: `${STORAGE}/exam.pdf` },
+  { date: "Sep 18, 2026", tag: "Calendar", title: "Academic Calendar 2026-27 Released", url: `${STORAGE}/calender.pdf` },
+  { date: "Oct 12, 2026", tag: "Event", title: "12th National Inter-College Moot Court Competition", url: `${STORAGE}/event.pdf` },
+  { date: "Jun 16, 2026", tag: "General", title: "General Notice from the Registrar's Office", url: `${STORAGE}/general-notice.pdf` },
 ];
 
 function Index() {
@@ -106,13 +109,15 @@ function Hero() {
               Apply Online
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <button
-              onClick={() => alert("Brochure download — coming soon.")}
+            <a
+              href={`${STORAGE}/download-broucher.pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-sm border border-white/40 px-6 py-3.5 text-sm font-semibold text-white transition hover:border-gold hover:bg-white/5 hover:text-gold"
             >
               <Download className="h-4 w-4" />
               Download Brochure
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -291,13 +296,15 @@ function Notices() {
                 </span>
               </div>
               <div className="flex-1 text-sm font-medium text-navy">{n.title}</div>
-              <button
-                onClick={(e) => { e.preventDefault(); alert(`Mock download: ${n.file}`); }}
+              <a
+                href={n.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary opacity-80 transition group-hover:opacity-100 hover:underline"
               >
                 <FileText className="h-3.5 w-3.5" />
                 Download
-              </button>
+              </a>
             </div>
           ))}
         </div>
